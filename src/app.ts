@@ -1,0 +1,98 @@
+// Deyaho Phone Calls MCP server (Streamable HTTP, stateless).
+// Thin layer: every tool forwards to the Deyaho Calls REST API. Voice and telephony run on
+// Deyaho's servers in the EU; this code never touches audio.
+import express, { type Request, type Response } from "express";
+import { McpServer } from "@modelcontextprotocol/server";
+import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
+import * as z from "zod/v4";
+
+export type Config = {
+  apiBase: string;              // e.g. https://mcp.deyaho.com
+  gatewaySecret?: string;       // set only when hosted behind a marketplace gateway
+  subscriberHeader?: string;    // header where the gateway puts the subscriber id
+};
+
+type Caller = { authorization?: string; subscriber?: string };
+
+// Gateway headers that may carry the subscriber id (first one present wins).
+const SUBSCRIBER_HEADERS = ["x-mcpize-user-id", "x-mcpize-subscriber-id", "x-mcpize-user", "x-user-id"];
+let loggedHeaders = false;
+
+function callerFrom(req: Request, cfg: Config): Caller {
+  if (cfg.gatewaySecret && !loggedHeaders) { loggedHeaders = true; console.log("request header names:", Object.keys(req.headers).join(",")); }
+  const names = cfg.subscriberHeader ? [cfg.subscriberHeader.toLowerCase()] : SUBSCRIBER_HEADERS;
+  const sub = names.map((h) => String(req.headers[h] || "")).find(Boolean) || (cfg.gatewaySecret ? "anonymous" : "");
+  // Deyaho API key: Authorization: Bearer <key> or x-deyaho-api-key.
+  const key = String(req.headers["x-deyaho-api-key"] || "");
+  const authorization = String(req.headers.authorization || "") || (key ? `Bearer ${key}` : "");
+  return { authorization: authorization || undefined, subscriber: sub || undefined };
+}
+
+async function api(cfg: Config, caller: Caller, method: string, path: string, body?: unknown) {
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  // Only Deyaho keys are forwarded (never a gateway's own token).
+  if (/dy_(live|mcp)_/.test(caller.authorization || "")) headers.authorization = caller.authorization!;
+  if (cfg.gatewaySecret && caller.subscriber) {
+    headers["x-gateway-secret"] = cfg.gatewaySecret;
+    headers["x-subscriber-id"] = caller.subscriber;
+  }
+  const r = await fetch(cfg.apiBase.replace(/\/$/, "") + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const data = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));
+  return { ok: r.ok, data };
+}
+
+function out(res: { ok: boolean; data: unknown }) {
+  return { content: [{ type: "text" as const, text: JSON.stringify(res.data, null, 2) }], isError: !res.ok };
+}
+
+export function buildServer(cfg: Config, caller: Caller): McpServer {
+  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.0" });
+
+  server.registerTool("make_call", {
+    description:
+      "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
+      "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
+      "Destinations: Spain (+34) and Mexico (+52) only, during local business hours. Calls are short (max 4 minutes). " +
+      "You must confirm the recipient asked for or agreed to be contacted. Poll get_call for the result.",
+    inputSchema: z.object({
+      to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
+      goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
+      language: z.enum(["es", "en"]).describe("Language the agent speaks"),
+      business_name: z.string().min(2).max(80).describe("Name of the business on whose behalf the agent calls"),
+      collect: z.array(z.string().max(80)).max(10).optional().describe("Data points to collect, e.g. ['preferred date', 'email']"),
+      consent_confirmed: z.literal(true).describe("Must be true: the recipient requested or agreed to be contacted"),
+      consent_statement: z.string().min(15).max(500).describe("How and when the recipient requested or agreed to be contacted"),
+    }),
+  }, async (args) => out(await api(cfg, caller, "POST", "/v1/calls", args)));
+
+  server.registerTool("get_call", {
+    description: "Get the status, duration, summary, collected data and transcript of a call placed with make_call.",
+    inputSchema: z.object({ call_id: z.string().describe("The call_id returned by make_call") }),
+  }, async ({ call_id }) => out(await api(cfg, caller, "GET", `/v1/calls/${encodeURIComponent(call_id)}`)));
+
+  server.registerTool("list_calls", {
+    description: "List the most recent calls placed with your key (newest first).",
+    inputSchema: z.object({ limit: z.number().int().min(1).max(50).optional().describe("How many calls, default 10") }),
+  }, async ({ limit }) => out(await api(cfg, caller, "GET", `/v1/calls?limit=${limit ?? 10}`)));
+
+  server.registerTool("get_pricing", {
+    description: "Free. Show the price per call/minute, limits, allowed countries and calling hours, and your remaining balance.",
+    inputSchema: z.object({}),
+  }, async () => out(await api(cfg, caller, "GET", "/v1/pricing")));
+
+  return server;
+}
+
+export function mcpRouter(cfg: Config) {
+  const router = express.Router();
+  router.post("/mcp", express.json({ limit: "64kb" }), async (req: Request, res: Response) => {
+    const server = buildServer(cfg, callerFrom(req, cfg));
+    const transport = new NodeStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    res.on("close", () => { transport.close().catch(() => {}); server.close().catch(() => {}); });
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  });
+  // Stateless server: no SSE stream, no sessions.
+  router.all("/mcp", (_req, res) => { res.status(405).json({ error: "Method not allowed" }); });
+  return router;
+}

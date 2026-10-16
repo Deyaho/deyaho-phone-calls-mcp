@@ -1,0 +1,15 @@
+version: 1
+name: deyaho-phone-calls
+description: "Let any AI place real phone calls (Spain and Mexico) with an AI voice agent and get the summary, collected data and transcript back."
+runtime: typescript
+entry: dist/index.js
+build:
+  install: npm ci
+  command: npm run build
+startCommand:
+  type: http
+  command: node dist/index.js
+secrets:
+  - name: GATEWAY_SECRET
+    required: true
+    description: Shared secret between this server and the Deyaho Calls API
