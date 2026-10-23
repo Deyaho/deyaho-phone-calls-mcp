@@ -3,7 +3,7 @@
   "name": "com.deyaho/phone-calls",
   "title": "Deyaho Phone Calls",
   "description": "AI places real phone calls (Spain, Mexico) with a voice agent and returns summary and transcript.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "websiteUrl": "https://deyaho.com/en/mcp",
   "repository": { "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp", "source": "github" },
   "remotes": [
