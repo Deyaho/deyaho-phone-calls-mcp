@@ -1,6 +1,6 @@
 {
   "name": "deyaho-phone-calls-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Remote MCP server: let any AI place real phone calls with a Deyaho AI voice agent and get the summary back.",
   "license": "MIT",
   "type": "module",

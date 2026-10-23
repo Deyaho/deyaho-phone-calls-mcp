@@ -46,7 +46,7 @@ function out(res: { ok: boolean; data: unknown }) {
 }
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.2" });
+  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.3" });
 
   server.registerTool("make_call", {
     title: "Make a phone call",
@@ -55,7 +55,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
       "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
       "Destinations: Spain (+34) and Mexico (+52) only, during local business hours. Calls are short (max 4 minutes). " +
-      "You must confirm the recipient asked for or agreed to be contacted. Poll get_call for the result. " +
+      "You must confirm the recipient asked for or agreed to be contacted. The result is returned by get_call using the call_id. " +
       "Pass website_url (the business website) and/or business_info so the agent can answer questions about prices, hours or services during the call.",
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
