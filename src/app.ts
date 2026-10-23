@@ -2,8 +2,8 @@
 // Thin layer: every tool forwards to the Deyaho Calls REST API. Voice and telephony run on
 // Deyaho's servers in the EU; this code never touches audio.
 import express, { type Request, type Response } from "express";
-import { McpServer } from "@modelcontextprotocol/server";
-import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
+import { McpServer, createMcpHandler } from "@modelcontextprotocol/server";
+import { toNodeHandler } from "@modelcontextprotocol/node";
 import * as z from "zod/v4";
 
 export type Config = {
@@ -18,7 +18,7 @@ type Caller = { authorization?: string; subscriber?: string };
 const SUBSCRIBER_HEADERS = ["x-mcpize-user-id", "x-mcpize-subscriber-id", "x-mcpize-user", "x-user-id"];
 let loggedHeaders = false;
 
-function callerFrom(req: Request, cfg: Config): Caller {
+function callerFrom(req: { headers: Record<string, string | string[] | undefined> }, cfg: Config): Caller {
   if (cfg.gatewaySecret && !loggedHeaders) { loggedHeaders = true; console.log("request header names:", Object.keys(req.headers).join(",")); }
   const names = cfg.subscriberHeader ? [cfg.subscriberHeader.toLowerCase()] : SUBSCRIBER_HEADERS;
   const sub = names.map((h) => String(req.headers[h] || "")).find(Boolean) || (cfg.gatewaySecret ? "anonymous" : "");
@@ -31,7 +31,7 @@ function callerFrom(req: Request, cfg: Config): Caller {
 async function api(cfg: Config, caller: Caller, method: string, path: string, body?: unknown) {
   const headers: Record<string, string> = { "content-type": "application/json" };
   // Only Deyaho keys are forwarded (never a gateway's own token).
-  if (/dy_(live|mcp)_/.test(caller.authorization || "")) headers.authorization = caller.authorization!;
+  if (/dy_(live|mcp|oat)_/.test(caller.authorization || "")) headers.authorization = caller.authorization!;
   if (cfg.gatewaySecret && caller.subscriber) {
     headers["x-gateway-secret"] = cfg.gatewaySecret;
     headers["x-subscriber-id"] = caller.subscriber;
@@ -93,13 +93,11 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
 
 export function mcpRouter(cfg: Config) {
   const router = express.Router();
-  router.post("/mcp", express.json({ limit: "64kb" }), async (req: Request, res: Response) => {
-    const server = buildServer(cfg, callerFrom(req, cfg));
-    const transport = new NodeStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-    res.on("close", () => { transport.close().catch(() => {}); server.close().catch(() => {}); });
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  });
+  // Serves the 2026-07-28 protocol (server/discover probes) and falls back to stateless 2025-era serving.
+  const handler = createMcpHandler((ctx) =>
+    buildServer(cfg, callerFrom({ headers: Object.fromEntries(ctx.requestInfo?.headers ?? []) }, cfg)));
+  const node = toNodeHandler(handler);
+  router.post("/mcp", express.json({ limit: "64kb" }), (req: Request, res: Response) => node(req, res, req.body));
   // Stateless server: no SSE stream, no sessions.
   router.all("/mcp", (_req, res) => { res.status(405).json({ error: "Method not allowed" }); });
   return router;
