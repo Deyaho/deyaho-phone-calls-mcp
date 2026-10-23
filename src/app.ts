@@ -55,7 +55,8 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
       "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
       "Destinations: Spain (+34) and Mexico (+52) only, during local business hours. Calls are short (max 4 minutes). " +
-      "You must confirm the recipient asked for or agreed to be contacted. Poll get_call for the result.",
+      "You must confirm the recipient asked for or agreed to be contacted. Poll get_call for the result. " +
+      "Pass website_url (the business website) and/or business_info so the agent can answer questions about prices, hours or services during the call.",
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
@@ -64,6 +65,8 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       collect: z.array(z.string().max(80)).max(10).optional().describe("Data points to collect, e.g. ['preferred date', 'email']"),
       consent_confirmed: z.literal(true).describe("Must be true: the recipient requested or agreed to be contacted"),
       consent_statement: z.string().min(15).max(500).describe("How and when the recipient requested or agreed to be contacted"),
+      website_url: z.string().url().max(300).optional().describe("Website of the business you call for. It is read before the call (up to 10 pages) so the agent can answer questions about prices, hours, services or address"),
+      business_info: z.string().max(4000).optional().describe("Extra facts about the business the agent may need (prices, hours, services, policies). The agent answers only with this and the website, never invents"),
     }),
   }, async (args) => out(await api(cfg, caller, "POST", "/v1/calls", args)));
 
