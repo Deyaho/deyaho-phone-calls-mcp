@@ -46,9 +46,11 @@ function out(res: { ok: boolean; data: unknown }) {
 }
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.0" });
+  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.1" });
 
   server.registerTool("make_call", {
+    title: "Make a phone call",
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     description:
       "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
       "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
@@ -66,16 +68,22 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
   }, async (args) => out(await api(cfg, caller, "POST", "/v1/calls", args)));
 
   server.registerTool("get_call", {
+    title: "Get call result",
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     description: "Get the status, duration, summary, collected data and transcript of a call placed with make_call.",
     inputSchema: z.object({ call_id: z.string().describe("The call_id returned by make_call") }),
   }, async ({ call_id }) => out(await api(cfg, caller, "GET", `/v1/calls/${encodeURIComponent(call_id)}`)));
 
   server.registerTool("list_calls", {
+    title: "List recent calls",
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     description: "List the most recent calls placed with your key (newest first).",
     inputSchema: z.object({ limit: z.number().int().min(1).max(50).optional().describe("How many calls, default 10") }),
   }, async ({ limit }) => out(await api(cfg, caller, "GET", `/v1/calls?limit=${limit ?? 10}`)));
 
   server.registerTool("get_pricing", {
+    title: "Get pricing and balance",
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     description: "Free. Show the price per call/minute, limits, allowed countries and calling hours, and your remaining balance.",
     inputSchema: z.object({}),
   }, async () => out(await api(cfg, caller, "GET", "/v1/pricing")));
