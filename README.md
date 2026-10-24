@@ -3,7 +3,7 @@
 **Let Claude, ChatGPT, Cursor or any AI agent make real phone calls to Mexico and Spain.** A remote MCP server: your agent calls a tool with a phone number and a goal, a Deyaho AI voice agent places the call, and you get back the summary, the collected data and the full transcript.
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
-- **Price:** 0.19 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
+- **Price:** 0.25 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
 - **Destinations:** Mexico (+52) and Spain (+34), called from local numbers (Mexico City and Madrid)
 - **Hours:** service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday (commercial calls to Spain go out from a 400 number)
 - **Languages:** Spanish or English
@@ -61,7 +61,7 @@ Without the header, sign in from `/mcp` inside Claude Code.
 
 ## Pricing
 
-0.19 USD per connected minute, rounded up to the minute. Prepaid packs: 52 min = 10 USD, 131 min = 25 USD, 263 min = 50 USD (also in EUR and MXN). No monthly fee, no number to buy. A 3-minute call costs 0.57 USD.
+0.25 USD per connected minute, rounded up to the minute. Prepaid packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD (also in EUR and MXN). No monthly fee, no number to buy. A 3-minute call costs 0.57 USD.
 
 ## Limits and compliance
 
@@ -89,7 +89,7 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 **Tu agente de IA (Claude, ChatGPT, Cursor) hace llamadas telefónicas reales en español a México y España.** Servidor MCP remoto: tu agente llama a una herramienta con un teléfono y un objetivo, un agente de voz con IA de Deyaho hace la llamada y recibes el resumen, los datos recogidos y la transcripción.
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth o API key)
-- **Precio:** 0,19 USD por minuto conectado, telefonía incluida, sin cuota mensual. No contestadas, comunicando y buzón de voz no se cobran.
+- **Precio:** 0,25 USD por minuto conectado, telefonía incluida, sin cuota mensual. No contestadas, comunicando y buzón de voz no se cobran.
 - **Destinos:** México (+52) y España (+34), desde números locales (Ciudad de México y Madrid)
 - **Guía, precios y preguntas frecuentes:** https://deyaho.com/mcp
 
@@ -99,7 +99,7 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 **Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
 
-**Precio:** 0,19 USD por minuto conectado. Packs: 52 min = 10 USD, 131 min = 25 USD, 263 min = 50 USD.
+**Precio:** 0,25 USD por minuto conectado. Packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD.
 
 **Límites:** 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez. Las llamadas de servicio funcionan de lunes a sábado de 09:00 a 21:00; las comerciales, de lunes a viernes, y en España salen por número 400. Domingos y festivos nacionales, sin llamadas. El agente avisa al empezar de que es una IA y de que la llamada se graba. Llama solo a quien haya pedido o aceptado ser contactado. Grabación borrada a los 15 días; transcripción, resumen y datos a los 90.
 
