@@ -1,27 +1,30 @@
 # Deyaho Phone Calls MCP
 
-Remote MCP server that lets any AI (Claude, ChatGPT, Cursor...) **place real phone calls** with an AI voice agent and get the **summary, collected data and transcript** back.
+**Let Claude, ChatGPT, Cursor or any AI agent make real phone calls to Mexico and Spain.** A remote MCP server: your agent calls a tool with a phone number and a goal, a Deyaho AI voice agent places the call, and you get back the summary, the collected data and the full transcript.
 
-- Endpoint: `https://mcp.deyaho.com/mcp` (Streamable HTTP)
-- Destinations: Spain (+34) and Mexico (+52), Monday to Friday 09:00-21:00 local time
-- Voice and telephony run on Deyaho's servers in the EU. This repository only contains the MCP layer.
+- **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
+- **Price:** 0.19 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
+- **Destinations:** Mexico (+52) and Spain (+34), called from local numbers (Mexico City and Madrid)
+- **Languages:** Spanish or English
+- **Website, guide and FAQ:** https://deyaho.com/en/mcp (Spanish: https://deyaho.com/mcp)
 
-[Español más abajo](#español)
+[Español más abajo](#mcp-de-llamadas-de-deyaho)
 
-## Tools
+## Install
 
-| Tool | What it does |
-|---|---|
-| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects `collect` fields. Returns `call_id`. Requires `consent_confirmed: true` and a `consent_statement`. |
-| `get_call` | Status, duration, summary, collected data and transcript. |
-| `list_calls` | Your latest calls. |
-| `get_pricing` | Free. Price, limits, hours and your balance. |
+Get a free Deyaho account and top up minutes at https://app.deyaho.com/dashboard/mcp. That page also creates API keys (`dy_mcp_...`) for clients that use one.
 
-The agent always opens by saying it is an AI assistant (EU AI Act, art. 50) and only names the business you give it.
+**Claude (claude.ai and Claude Desktop):** Settings > Connectors > Add custom connector, paste `https://mcp.deyaho.com/mcp`, click Connect and sign in with your Deyaho account (OAuth, no key needed).
 
-## Connect
+**Claude Code:**
 
-**Claude Desktop / Claude.ai / Cursor** - add a remote MCP server:
+```bash
+claude mcp add --transport http deyaho-calls https://mcp.deyaho.com/mcp --header "Authorization: Bearer dy_mcp_YOUR_KEY"
+```
+
+Without the header, sign in from `/mcp` inside Claude Code.
+
+**Cursor** (`~/.cursor/mcp.json` or `.cursor/mcp.json`):
 
 ```json
 {
@@ -34,15 +37,43 @@ The agent always opens by saying it is an AI assistant (EU AI Act, art. 50) and 
 }
 ```
 
-Get your key and prepaid minutes at https://app.deyaho.com/dashboard/mcp. Pricing: https://deyaho.com/en/mcp
+**ChatGPT:** Settings > Apps & Connectors > Advanced settings, turn on developer mode, create a connector with `https://mcp.deyaho.com/mcp` and OAuth authentication.
 
-## Limits
+**Any other MCP client:** the same URL over Streamable HTTP, with OAuth or the `Authorization: Bearer` header.
+
+## Example prompts
+
+- "Call +34 600 000 000 on behalf of Sun Clinic and confirm tomorrow's 10:00 appointment; if it does not suit them, ask for another time. They gave consent in the booking form. Then give me the summary and the transcript."
+- "Call +52 55 1234 5678 for Casa Azul Restaurant and remind them of their reservation for 4 people tonight at 21:00. They booked on our website and accepted reminder calls."
+- "Call the lead who just filled in our form (+34 611 222 333, consent in the form) on behalf of Nova Dental, ask what treatment they want and when they can come, and return the answers as data."
+- "Run a 3-question satisfaction survey with +52 33 9876 5432 for TallerMax (they agreed when they picked up their car) and give me each answer."
+- "Use get_pricing and tell me my balance."
+
+## Tools
+
+| Tool | What it does |
+|---|---|
+| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call) and `business_info`. Returns `call_id`. |
+| `get_call` | Status, duration, billed minutes, summary, collected data and full transcript. |
+| `list_calls` | Your latest calls, newest first. |
+| `get_pricing` | Free. Price, your balance, limits, countries and calling hours. |
+
+## Pricing
+
+0.19 USD per connected minute, rounded up to the minute. Prepaid packs: 52 min = 10 USD, 131 min = 25 USD, 263 min = 50 USD (also in EUR and MXN). No monthly fee, no number to buy. A 3-minute call costs 0.57 USD.
+
+## Limits and compliance
 
 - Max 4 minutes per call, 10 calls per day per key, one call at a time.
-- Blocked: emergency, premium-rate, toll-free and any country other than ES/MX.
-- You must only call people who requested or agreed to be contacted (Spain: prior consent for commercial calls; Mexico: REPEP).
+- Monday to Friday 09:00-21:00, local time of the destination.
+- Spain and Mexico only; emergency, premium-rate and toll-free numbers are blocked.
+- At the start the agent says it is an AI (EU AI Act art. 50) and that the call is recorded, and only names the business you give it.
+- Only call people who requested or agreed to be contacted (Spain: prior consent for commercial calls; Mexico: REPEP).
+- Voice and data are processed in the EU. Recordings are deleted after 15 days; transcript, summary and collected data after 90 days.
 
 ## Self-hosting this layer
+
+This repository contains only the MCP layer (MIT). Voice and telephony run on Deyaho's servers.
 
 ```bash
 npm ci && npm run build
@@ -51,21 +82,24 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 ---
 
-## Español
+## MCP de llamadas de Deyaho
 
-Servidor MCP remoto para que cualquier IA (Claude, ChatGPT, Cursor...) **haga llamadas telefónicas reales** con un agente de voz con IA y reciba el **resumen, los datos recogidos y la transcripción**.
+**Tu agente de IA (Claude, ChatGPT, Cursor) hace llamadas telefónicas reales en español a México y España.** Servidor MCP remoto: tu agente llama a una herramienta con un teléfono y un objetivo, un agente de voz con IA de Deyaho hace la llamada y recibes el resumen, los datos recogidos y la transcripción.
 
-- Endpoint: `https://mcp.deyaho.com/mcp` (Streamable HTTP)
-- Destinos: España (+34) y México (+52), de lunes a viernes de 09:00 a 21:00 hora local
-- La voz y la telefonía corren en servidores de Deyaho en la UE. Este repositorio solo contiene la capa MCP.
+- **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth o API key)
+- **Precio:** 0,19 USD por minuto conectado, telefonía incluida, sin cuota mensual. No contestadas, comunicando y buzón de voz no se cobran.
+- **Destinos:** México (+52) y España (+34), desde números locales (Ciudad de México y Madrid)
+- **Guía, precios y preguntas frecuentes:** https://deyaho.com/mcp
 
-Herramientas: `make_call` (devuelve `call_id`; exige `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
+**Instalación:** cuenta gratis y recarga en https://app.deyaho.com/dashboard/mcp. En Claude y Claude Desktop: Ajustes > Conectores > Añadir conector personalizado con `https://mcp.deyaho.com/mcp` e inicio de sesión. En Claude Code: `claude mcp add --transport http deyaho-llamadas https://mcp.deyaho.com/mcp --header "Authorization: Bearer dy_mcp_TU_CLAVE"`. En Cursor: el `mcp.json` de arriba. En ChatGPT: modo desarrollador y conector con la URL y OAuth.
 
-El agente siempre empieza diciendo que es un asistente con inteligencia artificial (AI Act, art. 50) y solo nombra al negocio que le indiques.
+**Ejemplo:** "Llama al +34 600 000 000 de parte de Clínica Sol y confirma la cita de mañana a las 10:00; si no le viene bien, pide otra hora. Me dio su consentimiento en el formulario de reserva. Después dame el resumen y la transcripción."
 
-Conexión: añade `https://mcp.deyaho.com/mcp` como servidor MCP remoto con la cabecera `Authorization: Bearer dy_mcp_TU_CLAVE` (clave y minutos en https://app.deyaho.com/dashboard/mcp). Precios: https://deyaho.com/mcp
+**Herramientas:** `make_call` (devuelve `call_id`; exige `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
 
-Límites: 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez. Bloqueados emergencias, tarificación especial, gratuitos y cualquier país que no sea ES o MX. Llama solo a quien haya pedido o aceptado ser contactado.
+**Precio:** 0,19 USD por minuto conectado. Packs: 52 min = 10 USD, 131 min = 25 USD, 263 min = 50 USD.
+
+**Límites:** 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez, de lunes a viernes de 09:00 a 21:00 hora local. El agente avisa al empezar de que es una IA y de que la llamada se graba. Llama solo a quien haya pedido o aceptado ser contactado. Grabación borrada a los 15 días; transcripción, resumen y datos a los 90.
 
 ## License
 

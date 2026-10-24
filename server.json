@@ -1,17 +1,25 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.deyaho/phone-calls",
-  "title": "Deyaho Phone Calls",
-  "description": "AI places real phone calls (Spain, Mexico) with a voice agent and returns summary and transcript.",
-  "version": "0.1.3",
+  "title": "Deyaho Phone Calls MCP",
+  "description": "Let any AI agent make real phone calls to Mexico and Spain. Telephony included, 0.19 USD/min.",
+  "version": "0.1.4",
   "websiteUrl": "https://deyaho.com/en/mcp",
-  "repository": { "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp", "source": "github" },
+  "repository": {
+    "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp",
+    "source": "github"
+  },
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://mcp.deyaho.com/mcp",
       "headers": [
-        { "name": "Authorization", "description": "Bearer <your Deyaho MCP key> (get it at https://app.deyaho.com/dashboard/mcp)", "isRequired": true, "isSecret": true }
+        {
+          "name": "Authorization",
+          "description": "Optional: Bearer <your Deyaho MCP key> from https://app.deyaho.com/dashboard/mcp. Clients with OAuth can sign in instead.",
+          "isRequired": false,
+          "isSecret": true
+        }
       ]
     }
   ]

@@ -46,7 +46,7 @@ function out(res: { ok: boolean; data: unknown }) {
 }
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", version: "0.1.3" });
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.4" });
 
   server.registerTool("make_call", {
     title: "Make a phone call",
