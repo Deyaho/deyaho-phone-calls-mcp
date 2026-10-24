@@ -46,7 +46,7 @@ function out(res: { ok: boolean; data: unknown }) {
 }
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.4" });
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.5" });
 
   server.registerTool("make_call", {
     title: "Make a phone call",
@@ -54,7 +54,9 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     description:
       "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
       "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
-      "Destinations: Spain (+34) and Mexico (+52) only, during local business hours. Calls are short (max 4 minutes). " +
+      "Destinations: Spain (+34) and Mexico (+52) only. Calls are short (max 4 minutes). " +
+      "Set call_purpose: service calls (appointments, reminders, surveys of your own customers, calls the person asked for) run Monday to Saturday 09:00-21:00 local time; " +
+      "commercial calls run Monday to Friday (Spain 09:00-21:00 and only from a 400 number; Mexico 09:00-19:00). No calls on Sundays or national holidays. " +
       "You must confirm the recipient asked for or agreed to be contacted. The result is returned by get_call using the call_id. " +
       "Pass website_url (the business website) and/or business_info so the agent can answer questions about prices, hours or services during the call.",
     inputSchema: z.object({
@@ -62,6 +64,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
       language: z.enum(["es", "en"]).describe("Language the agent speaks"),
       business_name: z.string().min(2).max(80).describe("Name of the business on whose behalf the agent calls"),
+      call_purpose: z.enum(["service", "commercial"]).describe("service: appointments, reminders, surveys of your own customers, or a call the person asked for. commercial: selling or offering something to someone who did not ask for it. It sets the allowed calling hours; commercial calls to Spain require a 400 number"),
       collect: z.array(z.string().max(80)).max(10).optional().describe("Data points to collect, e.g. ['preferred date', 'email']"),
       consent_confirmed: z.literal(true).describe("Must be true: the recipient requested or agreed to be contacted"),
       consent_statement: z.string().min(15).max(500).describe("How and when the recipient requested or agreed to be contacted"),

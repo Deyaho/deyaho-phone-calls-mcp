@@ -5,6 +5,7 @@
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
 - **Price:** 0.19 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
 - **Destinations:** Mexico (+52) and Spain (+34), called from local numbers (Mexico City and Madrid)
+- **Hours:** service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday (commercial calls to Spain go out from a 400 number)
 - **Languages:** Spanish or English
 - **Website, guide and FAQ:** https://deyaho.com/en/mcp (Spanish: https://deyaho.com/mcp)
 
@@ -53,7 +54,7 @@ Without the header, sign in from `/mcp` inside Claude Code.
 
 | Tool | What it does |
 |---|---|
-| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call) and `business_info`. Returns `call_id`. |
+| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). `call_purpose` is `service` (appointments, reminders, surveys of your own customers, calls the person asked for) or `commercial` (selling or offering something to someone who did not ask for it). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call) and `business_info`. Returns `call_id`. |
 | `get_call` | Status, duration, billed minutes, summary, collected data and full transcript. |
 | `list_calls` | Your latest calls, newest first. |
 | `get_pricing` | Free. Price, your balance, limits, countries and calling hours. |
@@ -65,7 +66,8 @@ Without the header, sign in from `/mcp` inside Claude Code.
 ## Limits and compliance
 
 - Max 4 minutes per call, 10 calls per day per key, one call at a time.
-- Monday to Friday 09:00-21:00, local time of the destination.
+- Calling hours depend on `call_purpose`, local time of the destination: service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday, Spain 09:00-21:00 and Mexico 09:00-19:00. No calls on Sundays or national holidays.
+- Since 17 October 2026, commercial calls to Spain must come from a 400 number. Until Deyaho has one, calls to Spain are service calls; `make_call` returns `commercial calls to Spain require a 400 number` otherwise.
 - Spain and Mexico only; emergency, premium-rate and toll-free numbers are blocked.
 - At the start the agent says it is an AI (EU AI Act art. 50) and that the call is recorded, and only names the business you give it.
 - Only call people who requested or agreed to be contacted (Spain: prior consent for commercial calls; Mexico: REPEP).
@@ -95,11 +97,11 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 **Ejemplo:** "Llama al +34 600 000 000 de parte de Clínica Sol y confirma la cita de mañana a las 10:00; si no le viene bien, pide otra hora. Me dio su consentimiento en el formulario de reserva. Después dame el resumen y la transcripción."
 
-**Herramientas:** `make_call` (devuelve `call_id`; exige `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
+**Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
 
 **Precio:** 0,19 USD por minuto conectado. Packs: 52 min = 10 USD, 131 min = 25 USD, 263 min = 50 USD.
 
-**Límites:** 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez, de lunes a viernes de 09:00 a 21:00 hora local. El agente avisa al empezar de que es una IA y de que la llamada se graba. Llama solo a quien haya pedido o aceptado ser contactado. Grabación borrada a los 15 días; transcripción, resumen y datos a los 90.
+**Límites:** 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez. Las llamadas de servicio funcionan de lunes a sábado de 09:00 a 21:00; las comerciales, de lunes a viernes, y en España salen por número 400. Domingos y festivos nacionales, sin llamadas. El agente avisa al empezar de que es una IA y de que la llamada se graba. Llama solo a quien haya pedido o aceptado ser contactado. Grabación borrada a los 15 días; transcripción, resumen y datos a los 90.
 
 ## License
 

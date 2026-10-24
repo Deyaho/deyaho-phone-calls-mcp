@@ -3,7 +3,7 @@
   "name": "com.deyaho/phone-calls",
   "title": "Deyaho Phone Calls MCP",
   "description": "Let any AI agent make real phone calls to Mexico and Spain. Telephony included, 0.19 USD/min.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "websiteUrl": "https://deyaho.com/en/mcp",
   "repository": {
     "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp",
