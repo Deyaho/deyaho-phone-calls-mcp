@@ -1,11 +1,11 @@
 # Deyaho Phone Calls MCP
 
-**Let Claude, ChatGPT, Cursor or any AI agent make real phone calls to Mexico and Spain.** A remote MCP server: your agent calls a tool with a phone number and a goal, a Deyaho AI voice agent places the call, and you get back the summary, the collected data and the full transcript.
+**Let Claude, ChatGPT, Cursor or any AI agent make real phone calls to Mexico, Spain, the United States, Canada, Colombia, Peru and the United Kingdom.** A remote MCP server: your agent calls a tool with a phone number and a goal, a Deyaho AI voice agent places the call, and you get back the summary, the collected data and the full transcript.
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
 - **Price:** 0.25 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
-- **Destinations:** Mexico (+52) and Spain (+34), called from local numbers (Mexico City and Madrid)
-- **Hours:** service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday (commercial calls to Spain go out from a 400 number)
+- **Destinations:** Mexico (+52), Spain (+34), United States and Canada (+1), Colombia (+57), Peru (+51) and United Kingdom (+44), each called from the line closest to it
+- **Hours:** service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday (commercial calls to Spain go out from a 400 number). Colombia, Peru and United Kingdom: service calls only. United States and Canada: informational calls only, every day 08:00-21:00 local time of the recipient, with `prior_express_consent=true` and `call_type`
 - **Languages:** Spanish or English
 - **Website, guide and FAQ:** https://deyaho.com/en/mcp (Spanish: https://deyaho.com/mcp)
 
@@ -68,9 +68,9 @@ Without the header, sign in from `/mcp` inside Claude Code.
 - Max 4 minutes per call, 10 calls per day per key, one call at a time.
 - Calling hours depend on `call_purpose`, local time of the destination: service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday, Spain 09:00-21:00 and Mexico 09:00-19:00. No calls on Sundays or national holidays.
 - Since 17 October 2026, commercial calls to Spain must come from a 400 number. Until Deyaho has one, calls to Spain are service calls; `make_call` returns `commercial calls to Spain require a 400 number` otherwise.
-- Spain and Mexico only; emergency, premium-rate and toll-free numbers are blocked.
+- Only the destinations above; emergency, premium-rate and toll-free numbers are blocked.
 - At the start the agent says it is an AI (EU AI Act art. 50) and that the call is recorded, and only names the business you give it.
-- Only call people who requested or agreed to be contacted (Spain: prior consent for commercial calls; Mexico: REPEP).
+- Only call people who requested or agreed to be contacted (Spain: prior consent for commercial calls; Mexico: REPEP; United States and Canada: prior express consent). Never cold calls to purchased lists.
 - Voice and data are processed in the EU. Recordings are deleted after 15 days; transcript, summary and collected data after 90 days.
 
 ## Self-hosting this layer

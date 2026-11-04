@@ -1,7 +1,7 @@
 {
   "name": "deyaho-phone-calls-mcp",
-  "version": "0.1.6",
-  "description": "Deyaho Phone Calls MCP: remote MCP server that lets any AI agent make real phone calls to Mexico and Spain (0.25 USD/min, telephony included).",
+  "version": "0.1.8",
+  "description": "Deyaho Phone Calls MCP: remote MCP server that lets any AI agent make real phone calls to Mexico, Spain, the United States, Canada, Colombia, Peru and the United Kingdom (0.25 USD/min, telephony included).",
   "license": "MIT",
   "type": "module",
   "main": "dist/app.js",

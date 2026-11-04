@@ -1,6 +1,6 @@
 version: 1
 name: deyaho-phone-calls
-description: "Let any AI place real phone calls (Spain and Mexico) with an AI voice agent and get the summary, collected data and transcript back."
+description: "Let any AI place real phone calls (Mexico, Spain, the United States, Canada, Colombia, Peru and the United Kingdom) with an AI voice agent and get the summary, collected data and transcript back."
 runtime: typescript
 entry: dist/index.js
 build:
