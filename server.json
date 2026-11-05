@@ -2,12 +2,13 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.deyaho/phone-calls",
   "title": "Deyaho Phone Calls MCP",
-  "description": "Real phone calls for AI agents: Mexico, Spain, US, Canada, Colombia, Peru, UK. 0.25 USD/min.",
-  "version": "0.1.8",
+  "description": "Real phone calls for AI agents: Spain, Mexico, US, Canada, Latin America, UK, EU. From 0.25 USD/min.",
+  "version": "0.1.10",
   "websiteUrl": "https://deyaho.com/en/mcp",
   "repository": {
     "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp",
-    "source": "github"
+    "source": "github",
+    "id": "1422599618"
   },
   "remotes": [
     {
@@ -20,6 +21,15 @@
           "isRequired": false,
           "isSecret": true
         }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://deyaho.com/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
       ]
     }
   ]

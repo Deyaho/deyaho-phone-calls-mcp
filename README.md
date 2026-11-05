@@ -4,7 +4,7 @@
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
 - **Price:** 0.25 USD per connected minute, telephony included, no monthly fee. Unanswered, busy and voicemail calls are free.
-- **Destinations:** Mexico (+52), Spain (+34), United States and Canada (+1), Colombia (+57), Peru (+51) and United Kingdom (+44), each called from the line closest to it
+- **Destinations:** Mexico (+52), Spain (+34), United States and Canada (+1), Colombia (+57), Peru (+51) and United Kingdom (+44), each called from the line closest to it. With a prepaid key, at their own price per minute: Argentina, Belize, Bolivia, Brazil, Chile, Costa Rica, Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal
 - **Hours:** service calls Monday to Saturday 09:00-21:00; commercial calls Monday to Friday (commercial calls to Spain go out from a 400 number). Colombia, Peru and United Kingdom: service calls only. United States and Canada: informational calls only, every day 08:00-21:00 local time of the recipient, with `prior_express_consent=true` and `call_type`
 - **Languages:** Spanish or English
 - **Website, guide and FAQ:** https://deyaho.com/en/mcp (Spanish: https://deyaho.com/mcp)
@@ -90,7 +90,7 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth o API key)
 - **Precio:** 0,25 USD por minuto conectado, telefonía incluida, sin cuota mensual. No contestadas, comunicando y buzón de voz no se cobran.
-- **Destinos:** México (+52) y España (+34), desde números locales (Ciudad de México y Madrid)
+- **Destinos:** México (+52), España (+34), Estados Unidos y Canadá (+1), Colombia (+57), Perú (+51) y Reino Unido (+44). Con clave prepago, a su propio precio por minuto: Argentina, Belice, Bolivia, Brasil, Chile, Costa Rica, Rep. Dominicana, Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panamá, Paraguay, Puerto Rico, Uruguay, Austria, Bélgica, Francia, Alemania, Irlanda, Italia, Países Bajos y Portugal
 - **Guía, precios y preguntas frecuentes:** https://deyaho.com/mcp
 
 **Instalación:** cuenta gratis y recarga en https://app.deyaho.com/dashboard/mcp. En Claude y Claude Desktop: Ajustes > Conectores > Añadir conector personalizado con `https://mcp.deyaho.com/mcp` e inicio de sesión. En Claude Code: `claude mcp add --transport http deyaho-llamadas https://mcp.deyaho.com/mcp --header "Authorization: Bearer dy_mcp_TU_CLAVE"`. En Cursor: el `mcp.json` de arriba. En ChatGPT: modo desarrollador y conector con la URL y OAuth.

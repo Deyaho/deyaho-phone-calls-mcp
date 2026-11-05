@@ -45,8 +45,16 @@ function out(res: { ok: boolean; data: unknown }) {
   return { content: [{ type: "text" as const, text: JSON.stringify(res.data, null, 2) }], isError: !res.ok };
 }
 
+// What make_call really accepts. Keep in sync with backend/src/rules.ts and server.json.
+const DESTINATIONS =
+  "Spain (+34), Mexico (+52), United States and Canada (+1), Colombia (+57), Peru (+51) and United Kingdom (+44). " +
+  "With a prepaid key, at their own price per minute (see get_pricing): Argentina, Belize, Bolivia, Brazil, Chile, Costa Rica, Dominican Republic, " +
+  "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
+
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.8" });
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.10" }, {
+    instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
+  });
 
   server.registerTool("make_call", {
     title: "Make a phone call",
@@ -54,7 +62,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     description:
       "Place a real outbound phone call with an AI voice agent and get a call_id. The agent introduces itself as an AI " +
       "assistant of the business you name, pursues the goal you describe, collects the requested data and hangs up. " +
-      "Destinations: Spain (+34), Mexico (+52), United States and Canada (+1), Colombia (+57), Peru (+51) and United Kingdom (+44). Calls are short (max 4 minutes). " +
+      "Destinations: " + DESTINATIONS + " Calls are short (max 4 minutes). " +
       "United States and Canada: informational calls only, every day 08:00-21:00 local time of the recipient, with prior_express_consent=true and call_type. Colombia, Peru and United Kingdom: service calls only, Monday to Saturday 09:00-21:00. " +
       "Set call_purpose: service calls (appointments, reminders, surveys of your own customers, calls the person asked for) run Monday to Saturday 09:00-21:00 local time; " +
       "commercial calls, only to Spain and Mexico, run Monday to Friday (Spain 09:00-21:00 and only from a 400 number; Mexico 09:00-19:00). In Spain and Mexico, no calls on Sundays or national holidays. " +
@@ -63,7 +71,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
-      language: z.enum(["es", "en"]).describe("Language the agent speaks"),
+      language: z.enum(["es","en","pt","fr","de","it","nl","zh","ar","ru","ja","ko","tr","pl","hi","sv","uk","id","ms","vi","el","ro","cs","da","no","fi","bg","hr","hu","sk"] as [string, ...string[]]).describe("Language the agent speaks (ISO 639-1)"),
       business_name: z.string().min(2).max(80).describe("Name of the business on whose behalf the agent calls"),
       call_purpose: z.enum(["service", "commercial"]).describe("service: appointments, reminders, surveys of your own customers, or a call the person asked for. commercial: selling or offering something to someone who did not ask for it. It sets the allowed calling hours; commercial calls to Spain require a 400 number"),
       collect: z.array(z.string().max(80)).max(10).optional().describe("Data points to collect, e.g. ['preferred date', 'email']"),
