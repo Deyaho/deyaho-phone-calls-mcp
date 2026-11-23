@@ -52,7 +52,7 @@ const DESTINATIONS =
   "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.11" }, {
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.12" }, {
     instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
   });
 
