@@ -52,7 +52,7 @@ const DESTINATIONS =
   "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.14" }, {
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.15" }, {
     instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
   });
 
@@ -103,7 +103,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
   server.registerTool("list_voices", {
     title: "List voices",
     annotations: { title: "List voices", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-    description: "Free. List the voices the agent can use, by language and country (every destination country, each with a default voice in its own accent), with name, gender and a link to a ~10 s audio sample. " +
+    description: "Free. List the voices the agent can use, by language and country (every destination country, each with a default Fish voice and its sample; Brazil in Brazilian Portuguese), with name, gender and a link to a ~10 s audio sample. " +
       "Each account picks its voice per country with set_voice (or in its dashboard) and every call uses it; pass a voice id or name as voice in make_call only to change it for one call. Without a chosen voice, the default voice of the destination country is used (Mexico: Emiliano). Signed in, the result also shows your_voices.",
     inputSchema: z.object({
       language: z.string().length(2).optional().describe("ISO 639-1 language, e.g. es or en"),
