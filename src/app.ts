@@ -68,7 +68,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       "commercial calls, only to Spain and Mexico, run Monday to Friday (Spain 09:00-21:00 and only from a 400 number; Mexico 09:00-19:00). In Spain and Mexico, no calls on Sundays or national holidays. " +
       "You must confirm the recipient asked for or agreed to be contacted. The result is returned by get_call using the call_id. " +
       "Pass website_url (the business website) and/or business_info so the agent can answer questions about prices, hours or services during the call. " +
-      "Optionally pass voice (an id or name from list_voices, in the language of the call); without it the default voice of the destination country is used (Mexico: Emiliano).",
+      "The agent speaks with the voice the account chose in its dashboard for the destination country (default: the country voice, Mexico: Emiliano); pass voice (an id or name from list_voices, in the language of the call) only to change it for this call.",
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
@@ -82,7 +82,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       call_type: z.enum(["appointment", "reminder", "collection"]).optional().describe("Required for +1 destinations: informational calls only, never cold prospecting"),
       website_url: z.string().url().max(300).optional().describe("Website of the business you call for. It is read before the call (up to 10 pages) so the agent can answer questions about prices, hours, services or address"),
       business_info: z.string().max(4000).optional().describe("Extra facts about the business the agent may need (prices, hours, services, policies). The agent answers only with this and the website, never invents"),
-      voice: z.string().max(64).optional().describe("Voice of the agent: a voice id or name from list_voices. It must speak the language of the call. Default: the default voice of the destination country (Mexico: Emiliano)"),
+      voice: z.string().max(64).optional().describe("Only to change the voice for this call: a voice id or name from list_voices, in the language of the call. Default: the voice the account chose in its dashboard, or the country default (Mexico: Emiliano)"),
     }),
   }, async (args) => out(await api(cfg, caller, "POST", "/v1/calls", args)));
 
@@ -104,7 +104,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     title: "List voices",
     annotations: { title: "List voices", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     description: "Free. List the voices the agent can use, by language and country, with name, gender and a link to a ~10 s audio sample. " +
-      "Pass the voice id or name as voice in make_call. Without voice, make_call uses the default voice of the destination country (Mexico: Emiliano).",
+      "Each account picks its voice in its dashboard and every call uses it; pass a voice id or name as voice in make_call only to change it for one call. Without a chosen voice, the default voice of the destination country is used (Mexico: Emiliano).",
     inputSchema: z.object({
       language: z.string().length(2).optional().describe("ISO 639-1 language, e.g. es or en"),
       country: z.string().length(2).optional().describe("ISO 3166-1 alpha-2 country of the accent, e.g. MX, ES or US"),
