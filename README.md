@@ -48,20 +48,22 @@ Without the header, sign in from `/mcp` inside Claude Code.
 - "Call +52 55 1234 5678 for Casa Azul Restaurant and remind them of their reservation for 4 people tonight at 21:00. They booked on our website and accepted reminder calls."
 - "Call the lead who just filled in our form (+34 611 222 333, consent in the form) on behalf of Nova Dental, ask what treatment they want and when they can come, and return the answers as data."
 - "Run a 3-question satisfaction survey with +52 33 9876 5432 for TallerMax (they agreed when they picked up their car) and give me each answer."
+- "Use list_voices for Mexico, play me the samples and call +52 55 1234 5678 with the voice I pick."
 - "Use get_pricing and tell me my balance."
 
 ## Tools
 
 | Tool | What it does |
 |---|---|
-| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). `call_purpose` is `service` (appointments, reminders, surveys of your own customers, calls the person asked for) or `commercial` (selling or offering something to someone who did not ask for it). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call) and `business_info`. Returns `call_id`. |
+| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). `call_purpose` is `service` (appointments, reminders, surveys of your own customers, calls the person asked for) or `commercial` (selling or offering something to someone who did not ask for it). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call), `business_info` and `voice` (an id or name from `list_voices`, in the language of the call; default: the voice of the destination country, Mexico: Emiliano). Returns `call_id`. |
 | `get_call` | Status, duration, billed minutes, summary, collected data and full transcript. |
 | `list_calls` | Your latest calls, newest first. |
+| `list_voices` | Free. Voices by `language` and `country`, with name, gender and a link to a ~10 s audio sample. |
 | `get_pricing` | Free. Price, your balance, limits, countries and calling hours. |
 
 ## Pricing
 
-0.25 USD per connected minute, rounded up to the minute. Prepaid packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD (also in EUR and MXN). No monthly fee, no number to buy. A 3-minute call costs 0.57 USD.
+0.25 USD per connected minute, rounded up to the minute. Prepaid packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD (also in EUR and MXN). No monthly fee, no number to buy. A 3-minute call costs 0.57 USD. Every new account has 1 free minute to try a call to its own phone.
 
 ## Limits and compliance
 
@@ -97,9 +99,9 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 **Ejemplo:** "Llama al +34 600 000 000 de parte de Clínica Sol y confirma la cita de mañana a las 10:00; si no le viene bien, pide otra hora. Me dio su consentimiento en el formulario de reserva. Después dame el resumen y la transcripción."
 
-**Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls` y `get_pricing` (gratis).
+**Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls`, `list_voices` (gratis: voces por idioma y país con muestra de audio de unos 10 s) y `get_pricing` (gratis). En `make_call`, `voice` (opcional) elige la voz; sin ella se usa la del país de destino (México: Emiliano).
 
-**Precio:** 0,25 USD por minuto conectado. Packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD.
+**Precio:** 0,25 USD por minuto conectado. Packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD. Cada cuenta nueva tiene 1 minuto gratis para probar llamando a su propio teléfono.
 
 **Límites:** 4 minutos por llamada, 10 llamadas al día por clave, una llamada a la vez. Las llamadas de servicio funcionan de lunes a sábado de 09:00 a 21:00; las comerciales, de lunes a viernes, y en España salen por número 400. Domingos y festivos nacionales, sin llamadas. El agente avisa al empezar de que es una IA y de que la llamada se graba. Llama solo a quien haya pedido o aceptado ser contactado. Grabación borrada a los 15 días; transcripción, resumen y datos a los 90.
 
