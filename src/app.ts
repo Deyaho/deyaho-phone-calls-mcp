@@ -52,7 +52,7 @@ const DESTINATIONS =
   "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.13" }, {
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.14" }, {
     instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
   });
 
@@ -103,7 +103,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
   server.registerTool("list_voices", {
     title: "List voices",
     annotations: { title: "List voices", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-    description: "Free. List the voices the agent can use, by language and country, with name, gender and a link to a ~10 s audio sample. " +
+    description: "Free. List the voices the agent can use, by language and country (every destination country, each with a default voice in its own accent), with name, gender and a link to a ~10 s audio sample. " +
       "Each account picks its voice per country with set_voice (or in its dashboard) and every call uses it; pass a voice id or name as voice in make_call only to change it for one call. Without a chosen voice, the default voice of the destination country is used (Mexico: Emiliano). Signed in, the result also shows your_voices.",
     inputSchema: z.object({
       language: z.string().length(2).optional().describe("ISO 639-1 language, e.g. es or en"),
@@ -122,7 +122,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     description: "Free. Save the agent voice of your account for one destination country (the same setting as the voice picker in app.deyaho.com/dashboard/mcp). " +
       "Every later call to that country uses it until you change it. Use list_voices to hear the samples and get ids or names; voice=\"default\" goes back to the country default.",
     inputSchema: z.object({
-      country: z.string().length(2).describe("Destination country, ISO 3166-1 alpha-2: MX, ES, US, GB, CO or PE"),
+      country: z.string().length(2).describe("Destination country, ISO 3166-1 alpha-2 (every destination with voices in list_voices: e.g. MX, ES, US, AR, FR, DE, BE)"),
       voice: z.string().min(1).max(64).describe("Voice id or name from list_voices for that country, or \"default\""),
     }),
   }, async ({ country, voice }) => out(await api(cfg, caller, "POST", "/v1/voice", { country, voice })));
