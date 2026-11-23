@@ -52,7 +52,7 @@ const DESTINATIONS =
   "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.15" }, {
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.16" }, {
     instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
   });
 
@@ -72,7 +72,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
-      language: z.enum(["es","en","pt","fr","de","it","nl","zh","ar","ru","ja","ko","tr","pl","hi","sv","uk","id","ms","vi","el","ro","cs","da","no","fi","bg","hr","hu","sk"] as [string, ...string[]]).describe("Language the agent speaks (ISO 639-1)"),
+      language: z.enum(["es","en","pt","fr","de","it","nl","zh","ar","ru","ja","ko","tr","pl","hi","sv","uk","id","ms","vi","el","ro","cs","da","no","fi","bg","hr","hu","sk"] as [string, ...string[]]).optional().describe("Language the agent speaks (ISO 639-1). Optional: by default, the language of the destination country (Brazil +55: Brazilian Portuguese; Spain and Latin America: Spanish; US, Canada, UK, Ireland, Belize: English; France: French; Germany and Austria: German; Italy: Italian; Portugal: Portuguese; Netherlands and Belgium: Dutch). Set it only to speak another language."),
       business_name: z.string().min(2).max(80).describe("Name of the business on whose behalf the agent calls"),
       call_purpose: z.enum(["service", "commercial"]).describe("service: appointments, reminders, surveys of your own customers, or a call the person asked for. commercial: selling or offering something to someone who did not ask for it. It sets the allowed calling hours; commercial calls to Spain require a 400 number"),
       collect: z.array(z.string().max(80)).max(10).optional().describe("Data points to collect, e.g. ['preferred date', 'email']"),

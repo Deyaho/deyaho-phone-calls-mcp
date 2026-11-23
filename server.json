@@ -3,7 +3,7 @@
   "name": "com.deyaho/phone-calls",
   "title": "Deyaho Phone Calls MCP",
   "description": "Let any AI place real phone calls with an AI voice agent and get the summary, data and transcript.",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "websiteUrl": "https://deyaho.com/en/mcp",
   "repository": {
     "url": "https://github.com/Deyaho/deyaho-phone-calls-mcp",
