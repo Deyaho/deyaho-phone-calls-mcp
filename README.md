@@ -55,10 +55,11 @@ Without the header, sign in from `/mcp` inside Claude Code.
 
 | Tool | What it does |
 |---|---|
-| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). `call_purpose` is `service` (appointments, reminders, surveys of your own customers, calls the person asked for) or `commercial` (selling or offering something to someone who did not ask for it). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call), `business_info` and `voice` (an id or name from `list_voices`, in the language of the call; default: the voice of the destination country, Mexico: Emiliano). Returns `call_id`. |
+| `make_call` | Calls `to` (E.164) on behalf of `business_name`, pursues `goal`, collects the `collect` fields, in `language` (es/en). `call_purpose` is `service` (appointments, reminders, surveys of your own customers, calls the person asked for) or `commercial` (selling or offering something to someone who did not ask for it). Requires `consent_confirmed: true` and a `consent_statement`. Optional `website_url` (the agent reads the business website before the call), `business_info` and `voice` (an id or name from `list_voices`, in the language of the call) to change the voice for that call only; by default the agent uses the voice the account chose with `set_voice` or in its dashboard, or the voice of the destination country (Mexico: Emiliano). Returns `call_id`. |
 | `get_call` | Status, duration, billed minutes, summary, collected data and full transcript. |
 | `list_calls` | Your latest calls, newest first. |
-| `list_voices` | Free. Voices by `language` and `country`, with name, gender and a link to a ~10 s audio sample. |
+| `list_voices` | Free. Voices by `language` and `country`, with name, gender and a link to a ~10 s audio sample. Signed in, it also shows `your_voices`. |
+| `set_voice` | Free. Saves the voice of your account for one destination `country` (`voice`: id or name from `list_voices`, or `default`). Every later call to that country uses it. Same setting as the voice picker in app.deyaho.com/dashboard/mcp. |
 | `get_pricing` | Free. Price, your balance, limits, countries and calling hours. |
 
 ## Pricing
@@ -99,7 +100,7 @@ DEYAHO_API_BASE=https://mcp.deyaho.com PORT=8080 npm start
 
 **Ejemplo:** "Llama al +34 600 000 000 de parte de Clínica Sol y confirma la cita de mañana a las 10:00; si no le viene bien, pide otra hora. Me dio su consentimiento en el formulario de reserva. Después dame el resumen y la transcripción."
 
-**Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls`, `list_voices` (gratis: voces por idioma y país con muestra de audio de unos 10 s) y `get_pricing` (gratis). En `make_call`, `voice` (opcional) elige la voz; sin ella se usa la del país de destino (México: Emiliano).
+**Herramientas:** `make_call` (devuelve `call_id`; exige `call_purpose` (`service` o `commercial`), `consent_confirmed: true` y `consent_statement`), `get_call`, `list_calls`, `list_voices` (gratis: voces por idioma y país con muestra de audio de unos 10 s), `set_voice` (gratis: fija la voz de tu cuenta para un país de destino, la misma que eliges en tu panel) y `get_pricing` (gratis). En `make_call`, `voice` (opcional) cambia la voz solo en esa llamada.
 
 **Precio:** 0,25 USD por minuto conectado. Packs: 40 min = 10 USD, 100 min = 25 USD, 200 min = 50 USD. Cada cuenta nueva tiene 1 minuto gratis para probar llamando a su propio teléfono.
 

@@ -52,7 +52,7 @@ const DESTINATIONS =
   "Ecuador, El Salvador, Guatemala, Honduras, Nicaragua, Panama, Paraguay, Puerto Rico, Uruguay, Austria, Belgium, France, Germany, Ireland, Italy, Netherlands and Portugal.";
 
 export function buildServer(cfg: Config, caller: Caller): McpServer {
-  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.12" }, {
+  const server = new McpServer({ name: "deyaho-phone-calls", title: "Deyaho Phone Calls MCP", version: "0.1.13" }, {
     instructions: "Real phone calls for AI agents, from 0.25 USD per connected minute. Destinations: " + DESTINATIONS + " Listing tools needs no credentials; using them needs a Deyaho API key or OAuth sign-in.",
   });
 
@@ -68,7 +68,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       "commercial calls, only to Spain and Mexico, run Monday to Friday (Spain 09:00-21:00 and only from a 400 number; Mexico 09:00-19:00). In Spain and Mexico, no calls on Sundays or national holidays. " +
       "You must confirm the recipient asked for or agreed to be contacted. The result is returned by get_call using the call_id. " +
       "Pass website_url (the business website) and/or business_info so the agent can answer questions about prices, hours or services during the call. " +
-      "The agent speaks with the voice the account chose in its dashboard for the destination country (default: the country voice, Mexico: Emiliano); pass voice (an id or name from list_voices, in the language of the call) only to change it for this call.",
+      "The agent speaks with the voice the account chose for the destination country with set_voice or in its dashboard (default: the country voice, Mexico: Emiliano); pass voice (an id or name from list_voices, in the language of the call) only to change it for this call.",
     inputSchema: z.object({
       to: z.string().describe("Destination phone number in E.164 format, e.g. +34600111222 or +525512345678"),
       goal: z.string().min(10).max(1500).describe("What the call must achieve, in plain language"),
@@ -82,7 +82,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
       call_type: z.enum(["appointment", "reminder", "collection"]).optional().describe("Required for +1 destinations: informational calls only, never cold prospecting"),
       website_url: z.string().url().max(300).optional().describe("Website of the business you call for. It is read before the call (up to 10 pages) so the agent can answer questions about prices, hours, services or address"),
       business_info: z.string().max(4000).optional().describe("Extra facts about the business the agent may need (prices, hours, services, policies). The agent answers only with this and the website, never invents"),
-      voice: z.string().max(64).optional().describe("Only to change the voice for this call: a voice id or name from list_voices, in the language of the call. Default: the voice the account chose in its dashboard, or the country default (Mexico: Emiliano)"),
+      voice: z.string().max(64).optional().describe("Only to change the voice for this call: a voice id or name from list_voices, in the language of the call. Default: the voice the account chose with set_voice or in its dashboard, or the country default (Mexico: Emiliano)"),
     }),
   }, async (args) => out(await api(cfg, caller, "POST", "/v1/calls", args)));
 
@@ -104,7 +104,7 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     title: "List voices",
     annotations: { title: "List voices", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     description: "Free. List the voices the agent can use, by language and country, with name, gender and a link to a ~10 s audio sample. " +
-      "Each account picks its voice in its dashboard and every call uses it; pass a voice id or name as voice in make_call only to change it for one call. Without a chosen voice, the default voice of the destination country is used (Mexico: Emiliano).",
+      "Each account picks its voice per country with set_voice (or in its dashboard) and every call uses it; pass a voice id or name as voice in make_call only to change it for one call. Without a chosen voice, the default voice of the destination country is used (Mexico: Emiliano). Signed in, the result also shows your_voices.",
     inputSchema: z.object({
       language: z.string().length(2).optional().describe("ISO 639-1 language, e.g. es or en"),
       country: z.string().length(2).optional().describe("ISO 3166-1 alpha-2 country of the accent, e.g. MX, ES or US"),
@@ -115,6 +115,17 @@ export function buildServer(cfg: Config, caller: Caller): McpServer {
     if (country) q.set("country", country);
     return out(await api(cfg, caller, "GET", "/v1/voices" + (q.toString() ? "?" + q : "")));
   });
+
+  server.registerTool("set_voice", {
+    title: "Set your voice",
+    annotations: { title: "Set your voice", readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    description: "Free. Save the agent voice of your account for one destination country (the same setting as the voice picker in app.deyaho.com/dashboard/mcp). " +
+      "Every later call to that country uses it until you change it. Use list_voices to hear the samples and get ids or names; voice=\"default\" goes back to the country default.",
+    inputSchema: z.object({
+      country: z.string().length(2).describe("Destination country, ISO 3166-1 alpha-2: MX, ES, US, GB, CO or PE"),
+      voice: z.string().min(1).max(64).describe("Voice id or name from list_voices for that country, or \"default\""),
+    }),
+  }, async ({ country, voice }) => out(await api(cfg, caller, "POST", "/v1/voice", { country, voice })));
 
   server.registerTool("get_pricing", {
     title: "Get pricing and balance",
