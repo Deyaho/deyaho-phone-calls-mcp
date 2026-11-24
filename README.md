@@ -1,5 +1,7 @@
 # Deyaho Phone Calls MCP
 
+[![Deyaho/deyaho-phone-calls-mcp MCP server](https://glama.ai/mcp/servers/Deyaho/deyaho-phone-calls-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Deyaho/deyaho-phone-calls-mcp)
+
 **Let Claude, ChatGPT, Cursor or any AI agent make real phone calls to Mexico, Spain, the United States, Canada, Colombia, Peru and the United Kingdom.** A remote MCP server: your agent calls a tool with a phone number and a goal, a Deyaho AI voice agent places the call, and you get back the summary, the collected data and the full transcript.
 
 - **Endpoint:** `https://mcp.deyaho.com/mcp` (Streamable HTTP, OAuth or API key)
